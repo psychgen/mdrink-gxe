@@ -1,0 +1,200 @@
+TITLE: ptsd2019_int
+DATA: FILE = "//ess01/P471/data/durable/projects/mdrink_gxe/data/ptsd2019_mplus.dat";
+VARIABLE: 
+NAMES = indid m_id sex parity mdrink_1 mdrink_2 mdrink_3 mdrink_pre ext_1 ext_3
+     ext_2 int_1 int_3 int_2 pgs_c pgs_f pgs_m icx11 icx12 m1 icx13 icx14 icx15
+     icx21 icx22 m2 icx23 icx24 icx25 icx31 icx32 m3 icx33 icx34 icx35 icm1 icm2
+     icm3 icm4 icm5; 
+MISSING=.;
+
+USEVARIABLES= mdrink_1 mdrink_2 mdrink_3 int_1 int_2 int_3 
+pgs_c sex parity mdrink_pre pgs_f pgs_m m1 m2 m3 
+icx11 icx12 icx13 icx14 icx15 icm1 icm2 icm3 icm4 icm5
+icx21 icx22 icx23 icx24 icx25 icx31 icx32 icx33 icx34 icx35;
+
+CLUSTER= m_id;
+WITHIN= sex parity pgs_c ;
+BETWEEN= pgs_m pgs_f; 
+
+DEFINE:
+center sex (GRANDMEAN);
+CENTER parity (GROUPMEAN);
+
+ANALYSIS:
+TYPE = TWOLEVEL ;
+!MODEL = NOCOV;
+H1ITERATIONS = 1;
+PROCESSORS = 5;
+MCONVERGENCE = 0.015; 
+LOGCRITERION = 0.005;
+MITERATIONS = 2000;
+
+
+MODEL:
+   %WITHIN%
+   !Covariates
+   int_1 ON parity sex mdrink_pre; 
+   int_2 ON parity sex mdrink_pre; 
+   int_3 ON parity sex mdrink_pre; 
+
+   !Main effect, individual level
+   int_1 ON mdrink_1  (b1_1);
+   int_2 ON mdrink_2  (b1_2);
+   int_3 ON mdrink_3  (b1_3);
+   
+   !Within-level moderation effect
+   int_1 ON m1  (b3_1);
+   int_2 ON m2  (b3_2);
+   int_3 ON m3  (b3_3);
+   
+   !Moderator direct effect
+   int_1 ON pgs_c (b2_1);
+   int_2 ON pgs_c (b2_2);
+   int_3 ON pgs_c (b2_3);
+
+   !Covariate interactions, within level;
+   int_1 ON icx11-icx15;
+   int_2 ON icx21-icx25;
+   int_3 ON icx31-icx35;
+   int_1 ON icm1-icm5;
+   int_2 ON icm1-icm5;
+   int_3 ON icm1-icm5;
+
+   !Variance maternal variable, individual level
+   mdrink_1(ew_1);
+   mdrink_2(ew_2);
+   mdrink_3(ew_3);
+   
+   !Variance child outcome , individual level
+   int_1 (ow_1);
+   int_2 (ow_2);
+   int_3 (ow_3);
+   
+   !Covariance, child outcomes, individual level
+   int_1 WITH int_2;
+   int_2 WITH int_3;
+   int_1 WITH int_3;
+
+   !Variance interaction terms, individual level
+   m1 (mw_1);
+   m2 (mw_2);
+   m3 (mw_3);
+   icx11-icx15;
+   icx21-icx25;
+   icx31-icx35;
+   icm1-icm5;
+
+   !Variance of the moderator and moderation effect to avoid listwise deletion;
+   pgs_c m1;
+
+   !Within level covariate variances (only when covariate is not ubiquitous to
+   !avoid listwise deletion);
+   mdrink_pre ;
+    
+   %BETWEEN%
+   
+   !EXPOSURE
+   !Latent variance component at between level, exposure variable 
+   i_m_1 BY mdrink_1@1;
+   i_m_1 BY mdrink_2@1;
+   i_m_1 BY mdrink_3@1;
+   !Direct effect of between component on child outcome (estimated)
+   i_m_1 BY int_1 (g1_1);
+   i_m_1 BY int_2 (g1_2);
+   i_m_1 BY int_3 (g1_3);
+   !Indirect effect, between level
+   int_1 ON mdrink_1  (b1_1);
+   int_2 ON mdrink_2  (b1_2);
+   int_3 ON mdrink_3  (b1_3);
+   
+   !COVARIATES
+   !Between level covariate effects
+   int_1 ON pgs_m pgs_f;
+   int_2 ON pgs_m pgs_f;
+   int_3 ON pgs_m pgs_f;
+   
+   !Between level covariate interaction effects
+   ! These are currently omitted as the complexity was breaking things...
+   ! Does this risk introducing bias, given that the interaction of interest
+   ! is decomposed across both levels?
+
+
+   !INTERACTION EFFECT
+   !Latent variance component at between level, interaction effect 
+   mb1 BY m1@1;
+   mb1 BY m2@1;
+   mb1 BY m3@1;
+   !Direct effect of between component of interaction effect on child outcome (estimated)
+   mb1 BY int_1 (g3_1);
+   mb1 BY int_2 (g3_2);
+   mb1 BY int_3 (g3_3);
+      !Indirect effect, between level
+   int_1 ON m1  (b3_1);
+   int_2 ON m2  (b3_2);
+   int_3 ON m3  (b3_3);
+
+   !Latent variance component mean @ 0
+   [ i_m_1@0 ];
+   [ mb1@0 ];
+   
+   !Between level obs maternal variable variance @ 0 
+   mdrink_1@0;
+   mdrink_2@0;
+   mdrink_3@0;
+  
+   !Between level obs int variance @ 0;
+   m1@0;
+   m2@0;
+   m3@0;
+   
+   !Covariance, child outcomes, between level
+   int_1 WITH int_2;
+   int_2 WITH int_3;
+   int_1 WITH int_3;
+   
+   !Between level obs child variance @ 0 
+   int_1 (ob_1);
+   int_2 (ob_2);
+   int_3 (ob_3);
+   
+   !Variance latent variable maternal var
+   i_m_1(eb_1);
+   mb1 (mb_1);
+
+   !Between level covariate variances;
+   pgs_m pgs_f;
+   
+   !Estimate means at this level
+   [ mdrink_1 mdrink_2 mdrink_3 m1 m2 m3];
+   [ int_1 ] (b0_1);
+   [ int_2 ] (b0_2);
+   [ int_3 ] (b0_3);
+   
+MODEL CONSTRAINT:
+
+!Test equaility of effects across time
+0=b1_1-b1_2;
+0=b1_2-b1_3;
+0=b2_1-b2_2;
+0=b2_2-b2_3;
+0=b3_1-b3_2;
+0=b3_2-b3_3;
+0=g1_1-g1_2;
+0=g1_2-g1_3;
+0=g3_1-g3_2;
+0=g3_2-g3_3;
+!Test equality of residual variances across time
+0=ow_1-ow_2;
+0=ow_2-ow_3;
+0=ob_1-ob_2;
+0=ob_2-ob_3;
+    
+OUTPUT:
+sampstat;
+CINTERVAL;
+stdyx;
+sval;
+
+savedata: FORMAT IS f10.5;
+results are ptsd2019_int_residuals_decimals.dat;   
+
