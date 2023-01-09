@@ -1,7 +1,7 @@
 Genotype-environment interplay in associations between maternal drinking
 and offspring emotional and behavioral problems: analysis code
 ================
-[Laurie Hannigan](mailto:laurie.hannigan@bristol.ac.uk)
+Laurie Hannigan (<laurie.hannigan@bristol.ac.uk>)
 
 - <a href="#introduction" id="toc-introduction">Introduction</a>
 - <a href="#data-preparation" id="toc-data-preparation">Data

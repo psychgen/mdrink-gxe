@@ -1,6 +1,6 @@
 ---
 title: "Genotype-environment interplay in associations between maternal drinking and offspring emotional and behavioral problems: analysis code"
-author: "[Laurie Hannigan](mailto:laurie.hannigan@bristol.ac.uk)"
+author: "Laurie Hannigan ([laurie.hannigan@bristol.ac.uk](mailto:laurie.hannigan@bristol.ac.uk))"
 output: 
   github_document:
     toc: true
