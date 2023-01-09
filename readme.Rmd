@@ -1,13 +1,63 @@
 ---
 title: "Genotype-environment interplay in associations between maternal drinking and offspring emotional and behavioral problems: analysis code"
-output: github_document
+author: "[Laurie Hannigan](mailto:laurie.hannigan@bristol.ac.uk)"
+output: 
+  github_document:
+    toc: true
+    toc_depth: 2
+bibliography: grateful-refs.bib
+nocite: |
+  @*
+
 ---
+***
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Description of contents...
+## Introduction
+
+This is the analytic code repository for the project entitled [Genotype-environment interplay in associations between maternal drinking and offspring emotional and behavioral problems](add_preprint_link). In it, we walk through the scripts used to complete the analyses for this project. 
+
+## Data preparation
+
+The data preparation script ([./scripts/00_data_prep.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/00_data_prep.R)) contains code to prepare the variables for analyses. It relies primarily on the [MoBatools](add link) packages `phenotools` and  `genotools`. 
+
+## Running linear models
+
+The linear models (i.e., unadjusted maternal drinking by PGS moderation analyses, plus models with adjustment for covariates in different tiers) are run by the  [./scripts/01_run_linear_models.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/01_run_linear_models.R) script, with reference to a script containing helper functions for this part of the analyses ([01a...funs.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/01_linear_model_funs.R)).
+
+## Running multilevel models
+
+Models with the final level of adjustment - that is, adjustment for unmeasured familial confounding - are run using the  [./scripts/02_run_multilevel_models.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/02_run_multilevel_models.R) script, with reference to a script containing helper functions for this part of the analyses ([02a...funs.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/02a_multilevel_model_funs.R)). Since these models are actuall run in Mplus, these scripts refer to scripts in the [./scripts/mplus](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/mplus) folder.
+
+## Running SNP-wise models
+
+In order to create the interaction effect-based "xPGS", we first run SNP-wise interaction models. These are set up using the [./scripts/03_run_SNP_models.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/03_run_SNP_models.R) code, which creates job scripts that are manually submitted to a high performance computing cluster (see [./scripts/bash](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/bash) folder.)
+
+## Creating xPGS and running xPGS models
+
+The scripts for creating the xPGS using PRSice (again on an HPC) are made using the [./scripts/04_make_xpgs.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/04_make_xpgs.R) code, supported by a helper functions script ([./scripts/04a_xpgs_funs.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/04a_xpgs_funs.R)). Then models using these xPGS are specified and run by scripts that essentially mirror earlier ones (scripts 05-06 ≈ scripts 01-02).
+
+## Collating results and plotting
+
+Finally, all results are collated and plotted in the [./scripts/07_collate_plot_res.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/07_collate_plot_res.R) code, supported by a helper functions script ([./scripts/07a_collate_funs.R](https://github.com/psychgen/mdrink-gxe/blob/master/scripts/07a_collate_funs.R)).
+
+## Used packages
+
+The following packages were used in this project, and we are grateful to their developers and maintainers:
 
 
+```{r eval=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
+library(grateful)
+
+
+cites <- get_citations(pkgs=c("phenotools","tidyverse","lavaan","tictoc","MplusAutomation",
+                         "ggthemes","patchwork","grateful"), out.dir =paste0(getwd(),"/reports"))
+
+cite_packages(pkgs=c("phenotools","tidyverse","lavaan","tictoc","MplusAutomation",
+                         "ggthemes","patchwork","grateful"))
+```
 
